@@ -20,6 +20,21 @@ class User(Base):
     volunteer_feedbacks = relationship("VolunteerFeedback", back_populates="user")
     dialect_stories = relationship("DialectStory", back_populates="user")
     school_checkins = relationship("SchoolCheckin", back_populates="user")
+    water_applications = relationship("WaterApplication", back_populates="user")
+
+class WaterApplication(Base):
+    __tablename__ = "water_applications"
+
+    application_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
+    crop_type = Column(String(50))
+    amount = Column(DECIMAL(5,1), nullable=False)
+    reason = Column(Text)
+    apply_time = Column(DateTime)
+    status = Column(Integer, default=0)
+    reject_reason = Column(Text)
+
+    user = relationship("User", back_populates="water_applications")
 
 class Video(Base):
     __tablename__ = "videos"

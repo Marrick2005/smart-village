@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
-from routers import farming, school, culture, analytics
+from routers import farming, school, culture, analytics, admin
 
 # Create database tables (in real app, use Alembic migrations)
 Base.metadata.create_all(bind=engine)
@@ -25,6 +25,7 @@ app.include_router(farming.router, prefix="/api/farming", tags=["智慧助农 (F
 app.include_router(school.router, prefix="/api/school", tags=["乡村学堂 (School)"])
 app.include_router(culture.router, prefix="/api/culture", tags=["文化融合 (Culture)"])
 app.include_router(analytics.router, prefix="/api/analytics", tags=["数据赋能 (Analytics)"])
+app.include_router(admin.router, prefix="/api/admin", tags=["后台管理 (Admin)"])
 
 @app.get("/")
 def read_root():

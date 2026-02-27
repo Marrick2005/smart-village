@@ -129,7 +129,7 @@ const initBarChart = () => {
   width: 100%;
 }
 .stat-card {
-  height: 160px;
+  min-height: 160px;
 }
 .stat-value {
   font-size: 32px;

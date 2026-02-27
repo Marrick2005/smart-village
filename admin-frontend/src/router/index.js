@@ -18,6 +18,24 @@ const routes = [
                 name: 'WaterUsage',
                 component: () => import('../views/water-usage/index.vue'),
                 meta: { title: '用水调度审批', icon: 'List' }
+            },
+            {
+                path: 'farming-behavior',
+                name: 'FarmingBehavior',
+                component: () => import('../views/farming-behavior/index.vue'),
+                meta: { title: '农事行为反馈', icon: 'DocumentChecked' }
+            },
+            {
+                path: 'volunteer',
+                name: 'Volunteer',
+                component: () => import('../views/volunteer/index.vue'),
+                meta: { title: '志愿者管理', icon: 'UserFilled' }
+            },
+            {
+                path: 'activity',
+                name: 'Activity',
+                component: () => import('../views/activity/index.vue'),
+                meta: { title: '活动管理', icon: 'Calendar' }
             }
         ]
     }

@@ -130,3 +130,16 @@ CREATE TABLE `school_checkins` (
   `status` TINYINT(1) DEFAULT 1 COMMENT '状态(1:正常)',
   FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB COMMENT='乡村学堂打卡记录表';
+
+-- 12. 用水申请表 (对应智慧助农模块用水申请与审批功能)
+CREATE TABLE `water_applications` (
+  `application_id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '申请编号(主码)',
+  `user_id` INT NOT NULL COMMENT '用户编号(外码)',
+  `crop_type` VARCHAR(50) COMMENT '所种作物(核桃/花椒等)',
+  `amount` DECIMAL(5,1) NOT NULL COMMENT '申请时长(小时)',
+  `reason` TEXT COMMENT '申请理由',
+  `apply_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '申请时间',
+  `status` TINYINT(1) DEFAULT 0 COMMENT '状态(0:待审批, 1:已通过, 2:已拒绝)',
+  `reject_reason` TEXT COMMENT '拒绝理由(如果被拒绝)',
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB COMMENT='用水申请表';

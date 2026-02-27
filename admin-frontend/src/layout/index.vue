@@ -20,6 +20,18 @@
             <el-icon><List /></el-icon>
             <template #title>用水调度审批</template>
           </el-menu-item>
+          <el-menu-item index="/farming-behavior">
+            <el-icon><DocumentChecked /></el-icon>
+            <template #title>农事实践反馈</template>
+          </el-menu-item>
+          <el-menu-item index="/volunteer">
+            <el-icon><UserFilled /></el-icon>
+            <template #title>志愿者管理</template>
+          </el-menu-item>
+          <el-menu-item index="/activity">
+            <el-icon><Calendar /></el-icon>
+            <template #title>活动管理</template>
+          </el-menu-item>
         </el-menu>
       </el-aside>
       
@@ -53,7 +65,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { DataLine, List, ArrowDown } from '@element-plus/icons-vue'
+import { DataLine, List, DocumentChecked, UserFilled, Calendar, ArrowDown } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const activePath = computed(() => route.path)

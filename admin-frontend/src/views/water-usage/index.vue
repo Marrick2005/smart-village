@@ -46,8 +46,11 @@
       <div class="pagination-container">
         <el-pagination
           background
-          layout="prev, pager, next"
-          :total="50"
+          layout="total, prev, pager, next"
+          :total="total"
+          v-model:current-page="currentPage"
+          :page-size="pageSize"
+          @current-change="handlePageChange"
           class="mt-4"
         />
       </div>
@@ -62,18 +65,27 @@ import axios from 'axios'
 
 const loading = ref(false)
 const tableData = ref([])
+const total = ref(0)
+const currentPage = ref(1)
+const pageSize = ref(20)
 
 const fetchData = async () => {
   loading.value = true
-  setTimeout(() => {
-    tableData.value = [
-      { id: '10001', applicant: '张三', village: '涉县第一村', crop: '核桃', amount: '2 小时', reason: '核桃果实膨大期，需要补充水分', date: '2023-11-20 10:30', status: 0 },
-      { id: '10002', applicant: '李四', village: '涉县第一村', crop: '花椒', amount: '1 小时', reason: '土壤干旱，需要微灌', date: '2023-11-20 11:15', status: 1 },
-      { id: '10003', applicant: '王五', village: '涉县第二村', crop: '核桃', amount: '3 小时', reason: '近一周无雨水', date: '2023-11-20 14:00', status: 0 },
-      { id: '10004', applicant: '赵六', village: '涉县第三村', crop: '玉米', amount: '1.5 小时', reason: '玉米抽穗期', date: '2023-11-19 09:20', status: 2 },
-    ]
+  try {
+    const res = await axios.get('/farming/water-usage/list', {
+      params: {
+        page: currentPage.value,
+        page_size: pageSize.value
+      }
+    })
+    tableData.value = res.data.data
+    total.value = res.data.total
+  } catch (error) {
+    ElMessage.error('加载用水申请数据失败')
+    console.error(error)
+  } finally {
     loading.value = false
-  }, 500)
+  }
 }
 
 fetchData()
@@ -88,20 +100,35 @@ const getStatusText = (status) => {
   return texts[status]
 }
 
+const handlePageChange = (page) => {
+  currentPage.value = page
+  fetchData()
+}
+
 const handleApprove = async (row) => {
   try {
     await ElMessageBox.confirm(`确认通过 ${row.applicant} 的用水申请吗？`, '审批确认', { confirmButtonText: '确定', cancelButtonText: '取消', type: 'success' })
+    await axios.post(`/farming/water-usage/${row.id}/status`, { status: 1 })
     row.status = 1
     ElMessage({ type: 'success', message: '已通过申请' })
-  } catch (err) {}
+  } catch (err) {
+    if (err !== 'cancel') {
+      ElMessage.error('操作失败')
+    }
+  }
 }
 
 const handleReject = async (row) => {
   try {
     const { value } = await ElMessageBox.prompt('请输入拒绝理由', '拒绝申请', { confirmButtonText: '确定', cancelButtonText: '取消' })
+    await axios.post(`/farming/water-usage/${row.id}/status`, { status: 2, reject_reason: value || '' })
     row.status = 2
     ElMessage({ type: 'success', message: `已拒绝申请，理由：${value || '无'}` })
-  } catch (err) {}
+  } catch (err) {
+    if (err !== 'cancel' && err?.message !== 'cancel') {
+      ElMessage.error('操作失败')
+    }
+  }
 }
 </script>
 

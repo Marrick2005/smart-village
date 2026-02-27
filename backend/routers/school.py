@@ -8,11 +8,26 @@ def get_videos(category: str = "儿童动画"):
     """
     分发视频列表
     """
+    if category == "职场普通话":
+        return {
+            "videos": [
+                {"id": 4, "title": "职场沟通技巧：如何流利做汇报", "category": category, "views": "1.5w"},
+                {"id": 5, "title": "外出务工标准普通话发音指南", "category": category, "views": "3.2k"},
+            ]
+        }
+    elif category == "老年防诈":
+        return {
+            "videos": [
+                {"id": 6, "title": "警惕！新型养老理财骗局大揭秘", "category": category, "views": "10w+"},
+                {"id": 7, "title": "手机收到不明来源的短信千万别点", "category": category, "views": "8.8w"},
+            ]
+        }
+        
     return {
         "videos": [
             {"id": 1, "title": "普通话小课堂：基础拼音", "category": category, "views": "1.2w"},
-            {"id": 2, "title": "科学小实验", "category": category, "views": "8k"},
-            {"id": 3, "title": "防诈骗动画", "category": category, "views": "2.2w"},
+            {"id": 2, "title": "科学小实验：会飞的鸡蛋", "category": category, "views": "8k"},
+            {"id": 3, "title": "儿童防诈骗动画：大灰狼不敲门", "category": category, "views": "2.2w"},
         ]
     }
 
