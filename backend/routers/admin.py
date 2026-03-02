@@ -96,3 +96,23 @@ def get_activities(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)
         
     total = db.query(PublicActivity).count()
     return {"total": total, "data": result}
+
+@router.get("/activities/{activity_id}/participants")
+def get_activity_participants(activity_id: int, db: Session = Depends(get_db)):
+    """获取特定活动的参与人员名单"""
+    from models import ActivityParticipation
+    
+    participants = db.query(ActivityParticipation, User.name)\
+        .join(User, ActivityParticipation.user_id == User.user_id)\
+        .filter(ActivityParticipation.activity_id == activity_id).all()
+        
+    result = []
+    for participation, user_name in participants:
+        result.append({
+            "participation_id": participation.participation_id,
+            "user_name": user_name,
+            "role": participation.role,
+            "duration": float(participation.participation_duration) if participation.participation_duration else 0
+        })
+        
+    return result

@@ -25,6 +25,11 @@
         <el-table-column prop="activity_description" label="活动说明" show-overflow-tooltip />
         <el-table-column prop="start_time" label="开始时间" width="180" />
         <el-table-column prop="end_time" label="结束时间" width="180" />
+        <el-table-column label="操作" width="120" align="center" fixed="right">
+          <template #default="scope">
+            <el-button link type="primary" @click="showParticipants(scope.row)">人员查看</el-button>
+          </template>
+        </el-table-column>
       </el-table>
       
       <div class="pagination-container">
@@ -39,6 +44,20 @@
         />
       </div>
     </el-card>
+
+    <!-- 活动参与人员抽屉 -->
+    <el-drawer
+      v-model="drawerVisible"
+      :title="`【${currentActivity.activity_name}】参与人员`"
+      direction="rtl"
+      size="40%"
+    >
+      <el-table :data="participantData" v-loading="drawerLoading" stripe border>
+        <el-table-column prop="user_name" label="姓名" width="120" />
+        <el-table-column prop="role" label="承担角色" />
+        <el-table-column prop="duration" label="参与时长 (小时)" width="150" align="center" />
+      </el-table>
+    </el-drawer>
   </div>
 </template>
 
@@ -52,6 +71,12 @@ const tableData = ref([])
 const total = ref(0)
 const currentPage = ref(1)
 const pageSize = ref(20)
+
+// 抽屉及参与人员相关
+const drawerVisible = ref(false)
+const drawerLoading = ref(false)
+const participantData = ref([])
+const currentActivity = ref({})
 
 const fetchData = async () => {
   loading.value = true
@@ -79,6 +104,22 @@ onMounted(() => {
 const handlePageChange = (page) => {
   currentPage.value = page
   fetchData()
+}
+
+const showParticipants = async (row) => {
+  currentActivity.value = row
+  drawerVisible.value = true
+  drawerLoading.value = true
+  participantData.value = []
+  try {
+    const res = await axios.get(`/admin/activities/${row.activity_id}/participants`)
+    participantData.value = res.data
+  } catch (error) {
+    ElMessage.error('获取人员名单失败')
+    console.error(error)
+  } finally {
+    drawerLoading.value = false
+  }
 }
 </script>
 

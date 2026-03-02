@@ -36,6 +36,12 @@ const routes = [
                 name: 'Activity',
                 component: () => import('../views/activity/index.vue'),
                 meta: { title: '活动管理', icon: 'Calendar' }
+            },
+            {
+                path: 'video-watch',
+                name: 'VideoWatch',
+                component: () => import('../views/video-watch/index.vue'),
+                meta: { title: '视频观看记录', icon: 'VideoPlay' }
             }
         ]
     }

@@ -32,6 +32,10 @@
             <el-icon><Calendar /></el-icon>
             <template #title>活动管理</template>
           </el-menu-item>
+          <el-menu-item index="/video-watch">
+            <el-icon><VideoPlay /></el-icon>
+            <template #title>视频观看记录</template>
+          </el-menu-item>
         </el-menu>
       </el-aside>
       
@@ -65,7 +69,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { DataLine, List, DocumentChecked, UserFilled, Calendar, ArrowDown } from '@element-plus/icons-vue'
+import { DataLine, List, DocumentChecked, UserFilled, Calendar, ArrowDown, VideoPlay } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const activePath = computed(() => route.path)
