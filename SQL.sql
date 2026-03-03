@@ -6,9 +6,10 @@ USE smart_village_db;
 CREATE TABLE `users` (
   `user_id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '用户编号(主码)',
   `name` VARCHAR(50) NOT NULL COMMENT '姓名',
+  `password` VARCHAR(255) COMMENT '登录密码',
   `gender` VARCHAR(10) COMMENT '性别', 
   `township` VARCHAR(100) COMMENT '所属乡镇',
-  `contact` VARCHAR(50) COMMENT '联系方式',
+  `contact` VARCHAR(50) COMMENT '联系方式(手机号)',
   `identity_type` VARCHAR(50) COMMENT '身份类型(农户/志愿者/管理员)'
 ) ENGINE=InnoDB COMMENT='用户信息表';
 
@@ -118,7 +119,9 @@ CREATE TABLE `dialect_stories` (
   `user_id` INT COMMENT '上传用户编号(外码)，未登录可为空',
   `upload_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
   `status` TINYINT(1) DEFAULT 0 COMMENT '审核状态(0:待审核, 1:已发布)',
-  FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE SET NULL
+  `landmark_id` INT COMMENT '关联的文化地标',
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE SET NULL,
+  FOREIGN KEY (`landmark_id`) REFERENCES `red_landmarks`(`landmark_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB COMMENT='乡村方言故事表';
 
 -- 11. 乡村学堂打卡表 (对应留守陪伴打卡功能)

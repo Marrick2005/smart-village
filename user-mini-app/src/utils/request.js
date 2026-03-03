@@ -1,5 +1,5 @@
-// 简单请求封装
-const BASE_URL = 'http://localhost:8000/api'
+// 简单请求封装 - 建议在小程序中使用 127.0.0.1 避免 localhost 解析问题
+const BASE_URL = 'http://127.0.0.1:8000/api'
 
 export const request = (options) => {
   return new Promise((resolve, reject) => {
@@ -12,10 +12,17 @@ export const request = (options) => {
         ...options.header
       },
       success: (res) => {
-        resolve(res.data)
+        console.log('请求成功反馈:', res)
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve(res.data)
+        } else {
+          uni.showToast({ title: `服务器错误: ${res.statusCode}`, icon: 'none' })
+          reject(res.data)
+        }
       },
       fail: (err) => {
-        uni.showToast({ title: '网络请求失败', icon: 'none' })
+        console.error('请求发起失败:', err)
+        uni.showToast({ title: '网络请求失败(请确认后端已启动)', icon: 'none' })
         reject(err)
       }
     })

@@ -107,10 +107,14 @@ const calculate = async () => {
 }
 
 const submitApply = async () => {
+  console.log('按钮点击: submitApply')
+  console.log('当前数据:', { duration: applyDuration.value, reason: applyReason.value })
   if (!applyDuration.value || !applyReason.value) {
+    console.warn('校验不通过: 字段缺失')
     return uni.showToast({ title: '请填写完整申请信息', icon: 'none' })
   }
   uni.showLoading({ title: '提交中...' })
+  console.log('准备发送请求...')
   try {
     const res = await request({
       url: '/farming/water-usage-apply',

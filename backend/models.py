@@ -7,6 +7,7 @@ class User(Base):
 
     user_id = Column(Integer, primary_key=True, index=True)
     name = Column(String(50), nullable=False)
+    password = Column(String(255), nullable=True) # Added for web login
     gender = Column(String(10))
     township = Column(String(100))
     contact = Column(String(50))
@@ -154,9 +155,25 @@ class DialectStory(Base):
     audio_url = Column(String(255), nullable=False)
     user_id = Column(Integer, ForeignKey("users.user_id", ondelete="SET NULL"), nullable=True)
     upload_time = Column(DateTime)
-    status = Column(Integer, default=0)
+    status = Column(Integer, default=0) # 0: 待审核, 1: 已通过, 2: 已拒绝
+    reject_reason = Column(Text, nullable=True) # 拒绝理由
+    landmark_id = Column(Integer, ForeignKey("red_landmarks.landmark_id", ondelete="SET NULL"), nullable=True)
 
     user = relationship("User", back_populates="dialect_stories")
+    landmark = relationship("RedLandmark", back_populates="stories")
+
+class RedLandmark(Base):
+    __tablename__ = "red_landmarks"
+
+    landmark_id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(255), nullable=False)
+    description = Column(Text)
+    latitude = Column(DECIMAL(10, 6), nullable=False)
+    longitude = Column(DECIMAL(11, 6), nullable=False)
+    create_time = Column(DateTime)
+    image_url = Column(String(255), nullable=True)
+
+    stories = relationship("DialectStory", back_populates="landmark")
 
 class SchoolCheckin(Base):
     __tablename__ = "school_checkins"
