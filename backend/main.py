@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database import engine, Base
-from routers import farming, school, culture, analytics, admin, auth, volunteer, culture_admin
+from routers import farming, school, culture, analytics, admin, auth, volunteer, culture_admin, guest
 from fastapi.staticfiles import StaticFiles
 import os
+from database import engine
+from models import Base
 
 # Create database tables (in real app, use Alembic migrations)
 Base.metadata.create_all(bind=engine)
@@ -17,7 +18,7 @@ app = FastAPI(
 # CORS configuration for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, restrict to actual frontend urls
+    allow_origins=["*"], # TODO: In production, specify actual frontend origins (e.g., ["https://yourdomain.com"])
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,6 +32,7 @@ app.include_router(analytics.router, prefix="/api/analytics", tags=["数据赋�
 app.include_router(admin.router, prefix="/api/admin", tags=["后台管理 (Admin)"])
 app.include_router(volunteer.router, prefix="/api/volunteer", tags=["志愿者端 (Volunteer)"])
 app.include_router(culture_admin.router, prefix="/api/admin/culture", tags=["文化管理 (Admin Culture)"])
+app.include_router(guest.router, prefix="/api/guest", tags=["游客端 (Guest)"])
 
 # Mount static files directory for local videos/images
 upload_dir = os.path.join(os.path.dirname(__file__), "uploads")

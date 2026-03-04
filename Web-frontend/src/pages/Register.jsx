@@ -10,6 +10,9 @@ export default function Register() {
     const [name, setName] = useState('');
     const [contact, setContact] = useState('');
     const [password, setPassword] = useState('');
+    const [identityType, setIdentityType] = useState('农户'); // Default to farmer
+    const [gender, setGender] = useState('男');
+    const [township, setTownship] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -18,7 +21,7 @@ export default function Register() {
         e.preventDefault();
         setError('');
 
-        if (!name || !contact || !password) {
+        if (!name || !contact || !password || !township) {
             setError('请填写所有必填字段');
             return;
         }
@@ -28,7 +31,10 @@ export default function Register() {
             await axios.post(`${API_BASE_URL}/auth/register`, {
                 name,
                 contact,
-                password
+                password,
+                identity_type: identityType,
+                gender,
+                township
             });
 
             // Success, go to login
@@ -46,14 +52,14 @@ export default function Register() {
     };
 
     return (
-        <div className="login-container">
+        <div className="login-container" style={{ overflowY: 'auto', padding: '20px 0' }}>
             <div className="login-background">
                 <div className="shape shape-1"></div>
                 <div className="shape shape-2"></div>
             </div>
 
-            <div className="login-content animate-fade-in">
-                <div className="login-card glass-panel">
+            <div className="login-content animate-fade-in" style={{ padding: '40px 0' }}>
+                <div className="login-card glass-panel" style={{ marginTop: '20px', marginBottom: '40px' }}>
                     <div className="login-header">
                         <h1 className="gradient-text">加入数字大脑</h1>
                         <p>创建一个新账户以开启您的智慧乡村之旅</p>
@@ -76,6 +82,36 @@ export default function Register() {
                             </div>
                         </div>
 
+                        <div className="input-group delay-100" style={{ marginBottom: '15px' }}>
+                            <label>性别</label>
+                            <div style={{ display: 'flex', gap: '20px', padding: '10px 0' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', margin: 0 }}>
+                                    <input 
+                                        type="radio" 
+                                        name="gender" 
+                                        value="男" 
+                                        checked={gender === '男'} 
+                                        onChange={(e) => setGender(e.target.value)}
+                                        disabled={loading}
+                                        style={{ accentColor: 'var(--primary-color)', width: '18px', height: '18px' }}
+                                    />
+                                    <span>男</span>
+                                </label>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', margin: 0 }}>
+                                    <input 
+                                        type="radio" 
+                                        name="gender" 
+                                        value="女" 
+                                        checked={gender === '女'} 
+                                        onChange={(e) => setGender(e.target.value)}
+                                        disabled={loading}
+                                        style={{ accentColor: 'var(--primary-color)', width: '18px', height: '18px' }}
+                                    />
+                                    <span>女</span>
+                                </label>
+                            </div>
+                        </div>
+
                         <div className="input-group delay-100">
                             <label>手机号码</label>
                             <div className="input-field">
@@ -85,6 +121,20 @@ export default function Register() {
                                     placeholder="请输入手机号"
                                     value={contact}
                                     onChange={(e) => setContact(e.target.value)}
+                                    disabled={loading}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="input-group delay-200">
+                            <label>所属乡镇</label>
+                            <div className="input-field">
+                                <span className="input-icon" style={{ fontSize: '18px', display: 'flex', alignItems: 'center' }}>🏙️</span>
+                                <input
+                                    type="text"
+                                    placeholder="请输入所属乡镇 (如: 某某镇某某村)"
+                                    value={township}
+                                    onChange={(e) => setTownship(e.target.value)}
                                     disabled={loading}
                                 />
                             </div>
@@ -101,6 +151,36 @@ export default function Register() {
                                     onChange={(e) => setPassword(e.target.value)}
                                     disabled={loading}
                                 />
+                            </div>
+                        </div>
+
+                        <div className="input-group delay-200" style={{ marginBottom: '15px' }}>
+                            <label>选择角色</label>
+                            <div style={{ display: 'flex', gap: '20px', padding: '10px 0' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', margin: 0 }}>
+                                    <input 
+                                        type="radio" 
+                                        name="identityType" 
+                                        value="农户" 
+                                        checked={identityType === '农户'} 
+                                        onChange={(e) => setIdentityType(e.target.value)}
+                                        disabled={loading}
+                                        style={{ accentColor: 'var(--primary-color)', width: '18px', height: '18px' }}
+                                    />
+                                    <span>村民/农户</span>
+                                </label>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', margin: 0 }}>
+                                    <input 
+                                        type="radio" 
+                                        name="identityType" 
+                                        value="志愿者" 
+                                        checked={identityType === '志愿者'} 
+                                        onChange={(e) => setIdentityType(e.target.value)}
+                                        disabled={loading}
+                                        style={{ accentColor: 'var(--primary-color)', width: '18px', height: '18px' }}
+                                    />
+                                    <span>志愿者</span>
+                                </label>
                             </div>
                         </div>
 

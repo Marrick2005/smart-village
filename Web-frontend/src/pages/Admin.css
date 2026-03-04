@@ -49,10 +49,28 @@
 }
 
 .table-container {
-  border-radius: var(--radius-xl);
+  border-radius: var(--fountain-radius);
   overflow: hidden;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(132, 154, 154, 0.1);
+  position: relative;
+  padding: 30px 20px 20px 20px; /* Added padding to prevent content clipping due to large top border-radius */
+}
+
+.table-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+  opacity: 0.5;
+  z-index: 10;
 }
 
 .admin-table {

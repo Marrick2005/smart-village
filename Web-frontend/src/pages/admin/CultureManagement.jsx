@@ -66,7 +66,7 @@ export default function CultureManagement() {
             };
             const script = document.createElement('script');
             script.id = 'amap-script';
-            script.src = 'https://webapi.amap.com/maps?v=2.0&key=416cd1b2e2b925c93dabe8c366c7c224';
+            script.src = 'https://webapi.amap.com/maps?v=2.0&key=YOUR_AMAP_KEY';
             script.async = true;
             document.head.appendChild(script);
         }

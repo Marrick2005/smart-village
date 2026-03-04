@@ -101,8 +101,16 @@ export default function Login() {
               </div>
             </div>
 
-            <div className="form-actions delay-300">
-              <a href="#" className="forgot-password">忘记密码？</a>
+            <div className="form-actions delay-300" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+              <button 
+                type="button" 
+                onClick={() => { localStorage.setItem('user', JSON.stringify({identity_type: '游客'})); navigate('/guest'); }} 
+                className="forgot-password" 
+                style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer', padding: 0 }}
+              >
+                游客免密访问 →
+              </button>
+              <Link to="/forgot-password" className="forgot-password">忘记密码？</Link>
             </div>
 
             <button

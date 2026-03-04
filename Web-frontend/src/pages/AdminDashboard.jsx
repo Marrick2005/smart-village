@@ -7,11 +7,14 @@ import DashboardStats from './admin/DashboardStats';
 import FarmingBehavior from './admin/FarmingBehavior';
 import VolunteerManagement from './admin/VolunteerManagement';
 import VideoWatchRecords from './admin/VideoWatchRecords';
+import UserManagement from './admin/UserManagement';
+import GuestFeedbackManagement from './admin/GuestFeedbackManagement';
 
 const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
 export default function AdminDashboard() {
     const [waterApps, setWaterApps] = useState([]);
+    const [waterFilters, setWaterFilters] = useState({ applicant: '', village: '', crop: '', status: '' });
     const [activities, setActivities] = useState([]);
     const [currentTab, setCurrentTab] = useState('dashboard');
     const [loading, setLoading] = useState(true);
@@ -161,6 +164,12 @@ export default function AdminDashboard() {
                             数据大屏
                         </button>
                         <button
+                            className={`tab-btn ${currentTab === 'user' ? 'active' : ''}`}
+                            onClick={() => setCurrentTab('user')}
+                        >
+                            用户管理
+                        </button>
+                        <button
                             className={`tab-btn ${currentTab === 'water' ? 'active' : ''}`}
                             onClick={() => setCurrentTab('water')}
                         >
@@ -191,6 +200,12 @@ export default function AdminDashboard() {
                             视频观看
                         </button>
                         <button
+                            className={`tab-btn ${currentTab === 'guest' ? 'active' : ''}`}
+                            onClick={() => setCurrentTab('guest')}
+                        >
+                            游客反馈
+                        </button>
+                        <button
                             className="tab-btn"
                             onClick={() => navigate('/admin/culture')}
                         >
@@ -200,12 +215,27 @@ export default function AdminDashboard() {
                 </div>
 
                 {currentTab === 'dashboard' && <DashboardStats />}
+                {currentTab === 'user' && <UserManagement />}
                 {currentTab === 'behavior' && <FarmingBehavior />}
                 {currentTab === 'volunteer' && <VolunteerManagement />}
                 {currentTab === 'video' && <VideoWatchRecords />}
+                {currentTab === 'guest' && <GuestFeedbackManagement />}
 
                 {currentTab === 'water' && (
                     <div className="table-container glass-panel delay-100">
+                        <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <h2 style={{ margin: 0, fontSize: '18px', color: 'var(--text-primary)', marginLeft: '15px', marginRight: 'auto' }}>用水申请管理</h2>
+                            <input type="text" placeholder="筛选申请人" value={waterFilters.applicant} onChange={e => setWaterFilters({ ...waterFilters, applicant: e.target.value })} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                            <input type="text" placeholder="筛选地点" value={waterFilters.village} onChange={e => setWaterFilters({ ...waterFilters, village: e.target.value })} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                            <input type="text" placeholder="筛选作物" value={waterFilters.crop} onChange={e => setWaterFilters({ ...waterFilters, crop: e.target.value })} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                            <select value={waterFilters.status} onChange={e => setWaterFilters({ ...waterFilters, status: e.target.value })} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #ccc' }}>
+                                <option value="">状态 (全部)</option>
+                                <option value="0">待审批</option>
+                                <option value="1">已通过</option>
+                                <option value="2">已拒绝</option>
+                            </select>
+                            <button className="btn-approve" onClick={() => setWaterFilters({ applicant: '', village: '', crop: '', status: '' })} style={{ padding: '6px 12px' }}>重置</button>
+                        </div>
                         <table className="admin-table">
                             <thead>
                                 <tr>
@@ -222,31 +252,41 @@ export default function AdminDashboard() {
                             <tbody>
                                 {loading ? (
                                     <tr><td colSpan="8" style={{ textAlign: 'center', padding: '40px' }}>加载中...</td></tr>
-                                ) : waterApps.length === 0 ? (
-                                    <tr><td colSpan="8" style={{ textAlign: 'center', padding: '40px' }}>暂无申请</td></tr>
-                                ) : waterApps.map(app => (
-                                    <tr key={app.id}>
-                                        <td>{app.applicant}</td>
-                                        <td>{app.village}</td>
-                                        <td>{app.crop}</td>
-                                        <td>{app.amount}</td>
-                                        <td>{app.date}</td>
-                                        <td style={{ maxWidth: '150px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={app.reason}>{app.reason}</td>
-                                        <td>
-                                            <span className={`status-badge status-${app.status}`}>
-                                                {app.status === 0 ? '待审批' : app.status === 1 ? '已通过' : '已拒绝'}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            {app.status === 0 && (
-                                                <div className="action-btns">
-                                                    <button className="btn-approve" onClick={() => handleApprove(app.id, 1)}>通过</button>
-                                                    <button className="btn-reject" onClick={() => handleApprove(app.id, 2)}>拒绝</button>
-                                                </div>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
+                                ) : (() => {
+                                    const filteredApps = waterApps.filter(app => {
+                                        if (waterFilters.applicant && !app.applicant.includes(waterFilters.applicant)) return false;
+                                        if (waterFilters.village && !app.village.includes(waterFilters.village)) return false;
+                                        if (waterFilters.crop && !app.crop.includes(waterFilters.crop)) return false;
+                                        if (waterFilters.status !== '' && app.status.toString() !== waterFilters.status) return false;
+                                        return true;
+                                    });
+                                    if (filteredApps.length === 0) {
+                                        return <tr><td colSpan="8" style={{ textAlign: 'center', padding: '40px' }}>暂无符合条件的申请</td></tr>;
+                                    }
+                                    return filteredApps.map(app => (
+                                        <tr key={app.id}>
+                                            <td>{app.applicant}</td>
+                                            <td>{app.village}</td>
+                                            <td>{app.crop}</td>
+                                            <td>{app.amount}</td>
+                                            <td>{app.date}</td>
+                                            <td style={{ maxWidth: '150px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={app.reason}>{app.reason}</td>
+                                            <td>
+                                                <span className={`status-badge status-${app.status}`}>
+                                                    {app.status === 0 ? '待审批' : app.status === 1 ? '已通过' : '已拒绝'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {app.status === 0 && (
+                                                    <div className="action-btns">
+                                                        <button className="btn-approve" onClick={() => handleApprove(app.id, 1)}>通过</button>
+                                                        <button className="btn-reject" onClick={() => handleApprove(app.id, 2)}>拒绝</button>
+                                                    </div>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ));
+                                })()}
                             </tbody>
                         </table>
                     </div>
@@ -255,7 +295,7 @@ export default function AdminDashboard() {
                 {currentTab === 'activity' && (
                     <div className="table-container glass-panel delay-100">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                            <h2 style={{ margin: 0, fontSize: '18px', color: 'var(--text-primary)' }}>活动名册</h2>
+                            <h2 style={{ margin: 0, fontSize: '18px', color: 'var(--text-primary)', marginLeft: '15px' }}>活动名册</h2>
                             <button onClick={() => setShowActivityModal(true)} style={{
                                 padding: '8px 16px', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600
                             }}>+ 发布新活动</button>

@@ -41,7 +41,7 @@ export default function FarmingBehavior() {
     return (
         <div className="table-container glass-panel delay-100">
             <div className="tab-header-actions" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                <h3 style={{ margin: 0, fontWeight: 600 }}>农事实践打卡反馈</h3>
+                <h3 style={{ margin: 0, fontWeight: 600, marginLeft: '15px' }}>农事实践打卡反馈</h3>
                 <button className="btn-approve" onClick={fetchData} style={{ padding: '6px 12px' }}>刷新数据</button>
             </div>
             <table className="admin-table">

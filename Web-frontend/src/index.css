@@ -1,40 +1,48 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
 
 :root {
-  --primary: #4F46E5;
-  --primary-hover: #4338CA;
-  --secondary: #10B981;
-  --background: #F8FAFC;
-  --surface: #FFFFFF;
-  --surface-hover: #F1F5F9;
-  --text-primary: #0F172A;
-  --text-secondary: #64748B;
-  --text-tertiary: #94A3B8;
-  --border: #E2E8F0;
-  --ring: rgba(79, 70, 229, 0.4);
-  --error: #EF4444;
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.5);
+  /* Morandi Palette */
+  --primary: #849A9A;      /* Morandi Teal / Grey-Blue */
+  --primary-hover: #6F8585;
+  --secondary: #D1C7BD;    /* Morandi Beige / Dusty Pink */
+  --background: #F5F3F0;   /* Warm Off-White */
+  --surface: rgba(255, 255, 255, 0.6);
+  --surface-hover: rgba(255, 255, 255, 0.8);
+  --text-primary: #4A4A4A; /* Soft Dark Grey */
+  --text-secondary: #7A7A7A;
+  --text-tertiary: #A0A0A0;
+  --border: rgba(132, 154, 154, 0.2);
+  --ring: rgba(132, 154, 154, 0.4);
+  --error: #D68A8A;        /* Muted Red */
   
+  /* Glassmorphism Variables */
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-shadow: 0 8px 32px rgba(132, 154, 154, 0.15);
+  
+  /* Border Radii (Fountain theme heavily uses large top radii) */
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
+  --fountain-radius: 4rem 4rem 1rem 1rem; /* The signature look */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0B1120;
-    --surface: #1E293B;
-    --surface-hover: #334155;
-    --text-primary: #F8FAFC;
-    --text-secondary: #94A3B8;
-    --text-tertiary: #64748B;
-    --border: #334155;
-    --ring: rgba(99, 102, 241, 0.5);
-    --glass-bg: rgba(30, 41, 59, 0.7);
+    /* Morandi Dark Mode (Cooler, softer darks) */
+    --background: #2B2F2F;
+    --surface: rgba(58, 64, 64, 0.6);
+    --surface-hover: rgba(78, 84, 84, 0.8);
+    --text-primary: #E5E4E2;
+    --text-secondary: #B0B3B3;
+    --text-tertiary: #848A8A;
+    --border: rgba(255, 255, 255, 0.1);
+    --ring: rgba(132, 154, 154, 0.5);
+    --glass-bg: rgba(43, 47, 47, 0.6);
     --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -51,6 +59,10 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Add a subtle global texture or background gradient if desired */
+  background-image: radial-gradient(circle at 50% 0%, rgba(209, 199, 189, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 100% 100%, rgba(132, 154, 154, 0.1) 0%, transparent 50%);
+  background-attachment: fixed;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -80,17 +92,57 @@ input, textarea {
   font-family: inherit;
 }
 
-/* Utilities */
+/* Base Glassmorphism Panel */
 .glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Fountain Architecture Theme */
+.fountain-arch {
+  border-radius: var(--fountain-radius) !important;
+}
+
+.fountain-card {
   background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border-radius: var(--fountain-radius);
+  box-shadow: 0 10px 30px rgba(132, 154, 154, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
+.fountain-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+  opacity: 0.5;
+}
+
+.fountain-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(132, 154, 154, 0.2), 
+              0 0 0 2px rgba(255, 255, 255, 0.5) inset;
+}
+
+.water-drop {
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(45deg);
+}
+
+/* Typography Enhancements */
 .gradient-text {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary), #A6B8B8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -105,12 +157,21 @@ input, textarea {
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes fountainRise {
+  from { opacity: 0; transform: translateY(40px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.animate-fountain {
+  animation: fountainRise 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .delay-100 { animation-delay: 0.1s; }

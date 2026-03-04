@@ -21,59 +21,57 @@
 
 .shape {
     position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.5;
+    filter: blur(60px); /* Slightly less blur to reveal the droplet shapes */
+    opacity: 0.6;
 }
 
+/* Water drop fountain shapes */
 .shape-1 {
-    width: 500px;
-    height: 500px;
-    background: var(--primary);
-    top: -100px;
+    width: 450px;
+    height: 450px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 50% 50% 50% 0;
+    top: -50px;
     left: -100px;
-    animation: float 10s ease-in-out infinite alternate;
+    transform: rotate(45deg);
+    animation: fountainDrop 12s ease-in-out infinite alternate;
 }
 
 .shape-2 {
     width: 400px;
     height: 400px;
-    background: var(--secondary);
-    bottom: -50px;
+    background: linear-gradient(135deg, var(--secondary), var(--primary-hover));
+    border-radius: 50% 50% 50% 0;
+    bottom: -100px;
     right: -50px;
-    animation: float 12s ease-in-out infinite alternate-reverse;
+    transform: rotate(225deg);
+    animation: fountainDropReverse 15s ease-in-out infinite alternate-reverse;
 }
 
 .shape-3 {
     width: 300px;
     height: 300px;
-    background: #A855F7;
+    background: var(--primary);
+    border-radius: 50% 50% 50% 0;
     top: 40%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    animation: pulse 8s ease-in-out infinite alternate;
+    transform: translate(-50%, -50%) rotate(135deg);
+    animation: pulseDrop 10s ease-in-out infinite alternate;
 }
 
-@keyframes float {
-    0% {
-        transform: translate(0, 0) rotate(0deg);
-    }
-
-    100% {
-        transform: translate(50px, 50px) rotate(20deg);
-    }
+@keyframes fountainDrop {
+    0% { transform: translate(0, 0) rotate(45deg); }
+    100% { transform: translate(50px, -80px) rotate(60deg) scale(1.1); }
 }
 
-@keyframes pulse {
-    0% {
-        transform: scale(1) translate(-50%, -50%);
-        opacity: 0.4;
-    }
+@keyframes fountainDropReverse {
+    0% { transform: translate(0, 0) rotate(225deg); }
+    100% { transform: translate(-40px, -100px) rotate(200deg) scale(1.1); }
+}
 
-    100% {
-        transform: scale(1.2) translate(-40%, -40%);
-        opacity: 0.7;
-    }
+@keyframes pulseDrop {
+    0% { transform: scale(1) translate(-50%, -50%) rotate(135deg); opacity: 0.4; }
+    100% { transform: scale(1.15) translate(-30%, -70%) rotate(160deg); opacity: 0.7; }
 }
 
 .login-content {
@@ -86,11 +84,27 @@
 
 .login-card {
     padding: 40px;
-    border-radius: var(--radius-2xl);
+    border-radius: var(--fountain-radius);
     display: flex;
     flex-direction: column;
     gap: 30px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 20px 40px rgba(132, 154, 154, 0.15), inset 0 2px 0 rgba(255, 255, 255, 0.5);
+    position: relative;
+}
+
+.login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+    opacity: 0.6;
 }
 
 .login-header {

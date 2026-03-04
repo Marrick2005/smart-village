@@ -24,7 +24,7 @@ def get_videos(category: str = "儿童动画", db: Session = Depends(get_db)):
                 "id": v.video_id, 
                 "title": v.video_topic, 
                 "category": v.video_type, 
-                "views": "1.2w", # 暂时模拟播放量
+                "views": 0, # Initial views
                 "url": v.video_url,
                 "cover": v.cover_url
             } for v in videos

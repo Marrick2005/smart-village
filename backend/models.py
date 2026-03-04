@@ -185,3 +185,11 @@ class SchoolCheckin(Base):
     status = Column(Integer, default=1)
 
     user = relationship("User", back_populates="school_checkins")
+
+class GuestFeedback(Base):
+    __tablename__ = "guest_feedbacks"
+
+    feedback_id = Column(Integer, primary_key=True, index=True)
+    content = Column(Text, nullable=False)
+    image_url = Column(String(255), nullable=True)
+    submit_time = Column(DateTime)

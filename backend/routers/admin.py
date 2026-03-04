@@ -3,11 +3,70 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from pydantic import BaseModel
 from database import get_db
-from models import FarmingBehaviorRecord, VolunteerFeedback, PublicActivity, User, Video
+from models import FarmingBehaviorRecord, VolunteerFeedback, PublicActivity, User, Video, GuestFeedback
 
 router = APIRouter()
 
 # --- Farming Behavior Endpoints ---
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    contact: Optional[str] = None
+    password: Optional[str] = None
+    identity_type: Optional[str] = None
+
+@router.get("/users")
+def get_all_users(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
+    """获取所有用户信息 (Admin)"""
+    users = db.query(User).offset(skip).limit(limit).all()
+    result = []
+    for u in users:
+        result.append({
+            "user_id": u.user_id,
+            "name": u.name,
+            "contact": u.contact,
+            "password": u.password, # Sending plain text as stored
+            "gender": u.gender,
+            "township": u.township,
+            "identity_type": u.identity_type
+        })
+    total = db.query(User).count()
+    return {"total": total, "data": result}
+
+@router.put("/users/{user_id}")
+def update_user(user_id: int, update_data: UserUpdate, db: Session = Depends(get_db)):
+    """管理员修改用户信息"""
+    user = db.query(User).filter(User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    if update_data.name is not None:
+        user.name = update_data.name
+    if update_data.contact is not None:
+        # Check if new contact conflicts with someone else
+        existing = db.query(User).filter(User.contact == update_data.contact, User.user_id != user_id).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Contact already exists for another user")
+        user.contact = update_data.contact
+    if update_data.password is not None:
+        user.password = update_data.password
+    if update_data.identity_type is not None:
+        user.identity_type = update_data.identity_type
+        
+    db.commit()
+    return {"status": "success", "message": "用户信息已更新"}
+
+@router.delete("/users/{user_id}")
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    """管理员删除用户"""
+    user = db.query(User).filter(User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    # User dependencies should be handled by ON DELETE CASCADE in db schema
+    db.delete(user)
+    db.commit()
+    return {"status": "success", "message": "用户已删除"}
 
 class FarmingBehaviorUpdate(BaseModel):
     is_adopted: bool
@@ -224,3 +283,20 @@ def delete_video(video_id: int, db: Session = Depends(get_db)):
     db.delete(video)
     db.commit()
     return {"status": "success", "message": "视频已删除"}
+
+# --- Guest Feedback Management ---
+
+@router.get("/guest-feedbacks")
+def get_guest_feedbacks(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
+    """管理员获取所有游客意见反馈"""
+    feedbacks = db.query(GuestFeedback).order_by(GuestFeedback.submit_time.desc()).offset(skip).limit(limit).all()
+    result = []
+    for f in feedbacks:
+        result.append({
+            "feedback_id": f.feedback_id,
+            "content": f.content,
+            "image_url": f.image_url,
+            "submit_time": f.submit_time
+        })
+    total = db.query(GuestFeedback).count()
+    return {"total": total, "data": result}
