@@ -67,15 +67,15 @@ INSERT INTO `school_checkins` (`checkin_id`, `user_id`, `image_url`, `checkin_ti
 -- 正在导出表  smart_village_db.users 的数据：~10 rows (大约)
 INSERT INTO `users` (`user_id`, `name`, `gender`, `township`, `contact`, `identity_type`, `password`) VALUES
 	(1, '张大壮', '男', '青山镇', '13800138001', '农户', 'YOUR_PASSWORD_HERE'),
-	(2, '李秀兰', '女', '青山镇', '13800138002', '农户', 'password123'),
-	(3, '王老汉', '男', '绿水乡', '13800138003', '农户', 'password123'),
-	(4, '赵大娘', '女', '白云村', '13800138004', '农户', 'password123'),
-	(5, '刘强', '男', '绿水乡', '13800138005', '农户', 'password123'),
-	(6, '王小明', '男', '绿水乡', '13900139001', '志愿者', 'password123'),
-	(7, '赵红梅', '女', '白云村', '13900139002', '志愿者', 'password123'),
-	(8, '陈书记', '男', '青山镇', '13500135001', '管理员', 'password123'),
-	(9, 'test', NULL, NULL, '18522603368', '农户', 'password123'),
-	(11, 'RefinementTestUser', '女', '涉县涉城镇一村', '13900000003', '农户', 'password123');
+	(2, '李秀兰', '女', '青山镇', '13800138002', '农户', 'YOUR_PASSWORD_HERE'),
+	(3, '王老汉', '男', '绿水乡', '13800138003', '农户', 'YOUR_PASSWORD_HERE'),
+	(4, '赵大娘', '女', '白云村', '13800138004', '农户', 'YOUR_PASSWORD_HERE'),
+	(5, '刘强', '男', '绿水乡', '13800138005', '农户', 'YOUR_PASSWORD_HERE'),
+	(6, '王小明', '男', '绿水乡', '13900139001', '志愿者', 'YOUR_PASSWORD_HERE'),
+	(7, '赵红梅', '女', '白云村', '13900139002', '志愿者', 'YOUR_PASSWORD_HERE'),
+	(8, '陈书记', '男', '青山镇', '13500135001', '管理员', 'YOUR_PASSWORD_HERE'),
+	(9, 'test', NULL, NULL, '18522603368', '农户', 'YOUR_PASSWORD_HERE'),
+	(11, 'RefinementTestUser', '女', '涉县涉城镇一村', '13900000003', '农户', 'YOUR_PASSWORD_HERE');
 
 -- 正在导出表  smart_village_db.video_watch_records 的数据：~4 rows (大约)
 INSERT INTO `video_watch_records` (`watch_id`, `video_id`, `user_id`, `click_time`, `actual_watch_duration`, `is_finished`) VALUES
