@@ -66,7 +66,7 @@ INSERT INTO `school_checkins` (`checkin_id`, `user_id`, `image_url`, `checkin_ti
 
 -- 正在导出表  smart_village_db.users 的数据：~10 rows (大约)
 INSERT INTO `users` (`user_id`, `name`, `gender`, `township`, `contact`, `identity_type`, `password`) VALUES
-	(1, '张大壮', '男', '青山镇', '13800138001', '农户', '123456'),
+	(1, '张大壮', '男', '青山镇', '13800138001', '农户', 'YOUR_PASSWORD_HERE'),
 	(2, '李秀兰', '女', '青山镇', '13800138002', '农户', 'password123'),
 	(3, '王老汉', '男', '绿水乡', '13800138003', '农户', 'password123'),
 	(4, '赵大娘', '女', '白云村', '13800138004', '农户', 'password123'),
