@@ -1,4 +1,4 @@
-# Environments
+﻿# Environments
 .env
 .venv
 env/
@@ -23,4 +23,5 @@ __pycache__/
 .Trashes
 ehthumbs.db
 # Local configuration
-database.py
+database.py.example
+

@@ -18,7 +18,9 @@ def calculate_irrigation(req: IrrigationRequest):
     接收作物的种类以及生长阶段并结合【实时气象数据】返回浇灌建议
     """
     import requests
-    API_KEY = "4a749afae1214b71899c69e5b9391442"
+    import config
+
+    API_KEY = config.QWEATHER_KEY
     LOCATION_ID = "101090306"
     
     try:
@@ -47,8 +49,9 @@ def get_current_weather():
     """获取当前天气详情 (Real-time QWeather API)"""
     import requests
     from datetime import datetime
+    import config
     
-    API_KEY = "4a749afae1214b71899c69e5b9391442"
+    API_KEY = config.QWEATHER_KEY
     LOCATION_ID = "101090306"  # 邯郸·涉县
     
     try:

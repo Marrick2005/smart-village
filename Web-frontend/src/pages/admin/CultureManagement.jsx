@@ -60,16 +60,26 @@ export default function CultureManagement() {
 
     // Ensure AMap is loaded
     useEffect(() => {
-        if (!window.AMap && !document.getElementById('amap-script')) {
-            window._AMapSecurityConfig = {
-                securityJsCode: 'e7fc49a97ab60843cd405e5fdb9840b6',
-            };
-            const script = document.createElement('script');
-            script.id = 'amap-script';
-            script.src = 'https://webapi.amap.com/maps?v=2.0&key=YOUR_AMAP_KEY';
-            script.async = true;
-            document.head.appendChild(script);
-        }
+        const loadAmap = async () => {
+            if (!window.AMap && !document.getElementById('amap-script')) {
+                try {
+                    const configRes = await axios.get(`${API_BASE_URL}/config`);
+                    const { amap_key, amap_security_code } = configRes.data;
+
+                    window._AMapSecurityConfig = {
+                        securityJsCode: amap_security_code,
+                    };
+                    const script = document.createElement('script');
+                    script.id = 'amap-script';
+                    script.src = `https://webapi.amap.com/maps?v=2.0&key=${amap_key}&plugin=AMap.PlaceSearch,AMap.AutoComplete`;
+                    script.async = true;
+                    document.head.appendChild(script);
+                } catch (error) {
+                    console.error("Failed to load Amap config:", error);
+                }
+            }
+        };
+        loadAmap();
     }, []);
 
     // --- Landmark Map Picker Logic ---

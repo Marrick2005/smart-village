@@ -1,10 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from routers import farming, school, culture, analytics, admin, auth, volunteer, culture_admin, guest
 from fastapi.staticfiles import StaticFiles
 import os
+from datetime import datetime
 from database import engine
 from models import Base
+import config
 
 # Create database tables (in real app, use Alembic migrations)
 Base.metadata.create_all(bind=engine)
@@ -39,6 +41,22 @@ upload_dir = os.path.join(os.path.dirname(__file__), "uploads")
 if not os.path.exists(upload_dir):
     os.makedirs(upload_dir)
 app.mount("/uploads", StaticFiles(directory=upload_dir), name="uploads")
+
+@app.post("/api/upload")
+async def upload_file(file: UploadFile = File(...)):
+    file_name = f"{int(datetime.now().timestamp())}_{file.filename}"
+    file_path = os.path.join(upload_dir, file_name)
+    with open(file_path, "wb") as buffer:
+        buffer.write(await file.read())
+    return {"url": f"http://127.0.0.1:8000/uploads/{file_name}"}
+
+@app.get("/api/config")
+def get_config():
+    return {
+        "amap_key": config.AMAP_KEY,
+        "amap_security_code": config.AMAP_SECURITY_CODE,
+        "qweather_key": config.QWEATHER_KEY
+    }
 
 @app.get("/")
 def read_root():

@@ -2,8 +2,9 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AMapLoader from '@amap/amap-jsapi-loader';
+import UploadModal from '../../components/UploadModal';
 import '../Home.css';
-import { MapPin, MessageSquare, Send, Camera } from 'lucide-react';
+import { MapPin, MessageSquare, Send, Camera, Image } from 'lucide-react';
 
 const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
@@ -23,6 +24,7 @@ export default function GuestHome() {
     const [feedbackContent, setFeedbackContent] = useState('');
     const [feedbackImage, setFeedbackImage] = useState('');
     const [submittingFeedback, setSubmittingFeedback] = useState(false);
+    const [showUploadModal, setShowUploadModal] = useState(false);
 
     useEffect(() => {
         // Authenticate guest
@@ -37,13 +39,17 @@ export default function GuestHome() {
             if (isMapLoading.current) return;
             isMapLoading.current = true;
             try {
+                // Fetch Amap configuration from backend
+                const configRes = await axios.get(`${API_BASE_URL}/config`);
+                const { amap_key, amap_security_code } = configRes.data;
+
                 // Initialize Amap JS API
                 window._AMapSecurityConfig = {
-                    securityJsCode: 'a29ae35f377c8e9803112bd78dca9d82',
+                    securityJsCode: amap_security_code,
                 };
 
                 const AMap = await AMapLoader.load({
-                    key: 'YOUR_AMAP_KEY', // Demo/Public key for rendering. Best to use real user key.
+                    key: amap_key, // Replaced demo key with dynamic key from backend
                     version: '2.0',
                     plugins: ['AMap.Scale', 'AMap.ToolBar', 'AMap.ControlBar'],
                 });
@@ -178,15 +184,29 @@ export default function GuestHome() {
 
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '13px', marginBottom: '8px' }}>
-                                <Camera size={16} /> <span>附加照片链接 (选项)</span>
+                                <Camera size={16} /> <span>附加照片 (选项)</span>
                             </div>
-                            <input
-                                type="url"
-                                placeholder="http://..."
-                                value={feedbackImage}
-                                onChange={(e) => setFeedbackImage(e.target.value)}
-                                style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px' }}
-                            />
+                            {feedbackImage ? (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc' }}>
+                                    <Image size={18} color="var(--primary)" />
+                                    <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '14px', color: '#334155' }}>
+                                        已上传: 继续附加将替换
+                                    </span>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setShowUploadModal(true)}
+                                        style={{ padding: '4px 8px', fontSize: '12px', background: 'white', border: '1px solid #cbd5e1', borderRadius: '4px', cursor: 'pointer' }}
+                                    >更换</button>
+                                </div>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowUploadModal(true)}
+                                    style={{ width: '100%', padding: '10px', border: '1px dashed #cbd5e1', borderRadius: '8px', background: 'transparent', color: '#64748b', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+                                >
+                                    <Camera size={18} /> 点击上传图片
+                                </button>
+                            )}
                         </div>
 
                         <button
@@ -251,6 +271,15 @@ export default function GuestHome() {
                     </div>
                 )}
             </main>
+
+            <UploadModal 
+                isOpen={showUploadModal} 
+                onClose={() => setShowUploadModal(false)}
+                onUploadSuccess={(url) => setFeedbackImage(url)}
+                accept="image/*"
+                title="上传反馈图片"
+                uploadUrl="/upload" 
+            />
         </div>
     );
 }
