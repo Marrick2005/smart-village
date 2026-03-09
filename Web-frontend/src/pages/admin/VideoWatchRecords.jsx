@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import UploadModal from '../../components/UploadModal';
+import { Camera, Video } from 'lucide-react';
 
 const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
@@ -11,6 +13,8 @@ export default function VideoWatchRecords() {
     const [videos, setVideos] = useState([]);
     const [videosLoading, setVideosLoading] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [showVideoUploadModal, setShowVideoUploadModal] = useState(false);
+    const [showCoverUploadModal, setShowCoverUploadModal] = useState(false);
     const [newVideo, setNewVideo] = useState({
         video_topic: '', video_type: '农业技术', video_url: '', cover_url: '', video_duration: 0
     });
@@ -279,8 +283,32 @@ export default function VideoWatchRecords() {
                                         <option>农业技术</option><option>儿童动画</option><option>文化宣传</option>
                                     </select>
                                 </div>
-                                <div><label>播放链接 (URL)</label><input required type="url" style={{ width: '100%', padding: '8px', marginTop: '5px' }} placeholder="如：http://127.0.0.1:8000/uploads/demo.mp4" value={newVideo.video_url} onChange={e => setNewVideo({ ...newVideo, video_url: e.target.value })} /></div>
-                                <div><label>封面图片链接 (URL)</label><input required type="url" style={{ width: '100%', padding: '8px', marginTop: '5px' }} value={newVideo.cover_url} onChange={e => setNewVideo({ ...newVideo, cover_url: e.target.value })} /></div>
+                                <div>
+                                    <label>播放链接 (URL)</label>
+                                    {newVideo.video_url ? (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '5px' }}>
+                                            <input required type="url" style={{ flex: 1, padding: '8px' }} value={newVideo.video_url} onChange={e => setNewVideo({ ...newVideo, video_url: e.target.value })} />
+                                            <button type="button" onClick={() => setShowVideoUploadModal(true)} style={{ padding: '8px', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>重新上传</button>
+                                        </div>
+                                    ) : (
+                                        <button type="button" onClick={() => setShowVideoUploadModal(true)} style={{ width: '100%', padding: '10px', marginTop: '5px', border: '1px dashed #cbd5e1', borderRadius: '8px', background: 'transparent', color: '#64748b', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                            <Video size={18} /> 上传视频文件
+                                        </button>
+                                    )}
+                                </div>
+                                <div>
+                                    <label>封面图片链接 (URL)</label>
+                                    {newVideo.cover_url ? (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '5px' }}>
+                                            <input required type="url" style={{ flex: 1, padding: '8px' }} value={newVideo.cover_url} onChange={e => setNewVideo({ ...newVideo, cover_url: e.target.value })} />
+                                            <button type="button" onClick={() => setShowCoverUploadModal(true)} style={{ padding: '8px', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>重新上传</button>
+                                        </div>
+                                    ) : (
+                                        <button type="button" onClick={() => setShowCoverUploadModal(true)} style={{ width: '100%', padding: '10px', marginTop: '5px', border: '1px dashed #cbd5e1', borderRadius: '8px', background: 'transparent', color: '#64748b', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                            <Camera size={18} /> 上传封面图片
+                                        </button>
+                                    )}
+                                </div>
                                 <div>
                                     <label>视频时长 (秒) {detectingDuration && <span style={{ color: 'var(--primary)', fontSize: '12px' }}> (🔍 正在自动识别...)</span>}</label>
                                     <input required type="number" style={{ width: '100%', padding: '8px', marginTop: '5px', backgroundColor: detectingDuration ? '#f0f9ff' : 'white' }} value={newVideo.video_duration} onChange={e => setNewVideo({ ...newVideo, video_duration: parseInt(e.target.value) || 0 })} placeholder="识别中..." />
@@ -293,6 +321,24 @@ export default function VideoWatchRecords() {
                     </div>
                 )}
             </div>
+            
+            <UploadModal 
+                isOpen={showVideoUploadModal} 
+                onClose={() => setShowVideoUploadModal(false)}
+                onUploadSuccess={(url) => setNewVideo({ ...newVideo, video_url: url })}
+                accept="video/*"
+                title="上传视频文件"
+                uploadUrl="/upload" 
+            />
+
+            <UploadModal 
+                isOpen={showCoverUploadModal} 
+                onClose={() => setShowCoverUploadModal(false)}
+                onUploadSuccess={(url) => setNewVideo({ ...newVideo, cover_url: url })}
+                accept="image/*"
+                title="上传视频封面"
+                uploadUrl="/upload" 
+            />
         </div>
     );
 }

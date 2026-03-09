@@ -6,6 +6,8 @@
 
 “涉县乡村公益数字大脑” 是一个为涉县量身定制的乡村数字化公益服务系统。该项目主旨涵盖：**智慧助农、乡村学堂、文化融合、数据赋能** 四大核心模块。系统采用前后端分离的架构，旨在为农户、留守儿童、游客（C端用户）以及村支书/管理团队（B/G端用户）提供一体化的数字平台解决方案。
 
+---
+
 ## 🛠️ 技术栈选型架构
 
 本项目划分为 Web 前端（多角色门户）、管理端后台和核心服务端三层：
@@ -16,7 +18,7 @@
 | **管理端 (To B/G)**| **React + Vite** | 面向村支书、管理员。<br>涉及：数据看板管理、应用审批、高德地图 API 景点配置、视听资源审核。 |
 | **服务端 (Backend)**| **Python (FastAPI)** | 提供轻量、高并发异步的 API 接口。<br>集成接口文档自动生成。 |
 | **数据与存储库** | **MySQL**, **SQLAlchemy**| MySQL 负责持久化存储 E-R 数据实体；使用 Local Storage 暂代 OSS 存储媒体文件。 |
-|- **外部生态接口 (API)**| **高德地图、和风天气**| **高德地图** (AMap)：支撑文化地标的定位与地图选点业务。<br>**和风天气** (QWeather)：提供气象数据支撑智慧助农模块的节水灌溉算法。|
+| **外部生态接口 (API)**| **高德地图、和风天气**| **高德地图** (AMap)：支撑文化地标的定位与地图选点业务。<br>**和风天气** (QWeather)：提供气象数据支撑智慧助农模块的节水灌溉算法。|
 
 ---
 
@@ -41,23 +43,136 @@
 
 ---
 
-## 🚦 当前项目进度与维护计划 (维护阶段)
+## ⚙️ 本地快速运行与配置指南
 
-本项目目前大部分开发工作已完成，**正式进入系统维护与小范围调优阶段**。核心 Web 业务流已全面打通。
+### 1. 数据库构建
+1. 在本地建立 MySQL 数据库：
+   ```sql
+   CREATE DATABASE smart_village_db DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+2. 使用 `mysql` 命令行或图形化工具（如 Navicat/DataGrip）按顺序执行：
+   - 首先执行 `NewSQL.sql`（创建核心数据库结构）。
+   - 可选执行 `test0.sql`（导入基础测试数据）。
 
-### 1. 数据库文档与 ER 图 (✅ 修正完成)
-- 针对敏捷开发中新增的 `landmark_id`、`reject_reason` 及游客反馈等字段，已完成数据库 schema 的统一梳理。
-- 物理 SQL 文件已与 `models.py` 定义保持一致，解决了早期文档脱节的问题。
+### 2. API 密钥与数据库配置 (`backend/config.py`)
+为了简化配置，所有的数据库账号、密码以及第三方 API Key 都已集中在 `backend/config.py` 中管理。
+请打开并根据您的实际环境填写以下信息：
+```python
+# backend/config.py
+DB_USER = "root"
+DB_PASSWORD = "your_actual_password"  # 您本地 MySQL 的实际密码
+DB_HOST = "localhost"
+DB_PORT = "3306"
+DB_NAME = "smart_village_db"
 
-### 2. 系统细节与性能优化 (In Progress)
-- **已完成优化：** 移除了冗余的调试代码（Debug scripts）、清理了 AI 协作生成的冗余注释、优化了生产环境下的跨域配置（CORS）。
-- **待优化：** 视频大文件的流式分片上传机制；本地存储向云端 OSS 的平滑迁移。
+AMAP_KEY = "your_amap_key_here" # 高德地图 Key
+AMAP_SECURITY_CODE = "your_amap_security_code_here" # 高德地图安全密钥
+QWEATHER_KEY = "your_qweather_key_here" # 和风天气 Key
+```
 
-### 3. 多端小程序迁移计划 (Pending)
-- 前期验证工作已完成，目前系统以 Web 端的稳定运行为主。是否继续向微信小程序环境迁移将视后续实际运营反馈而定。
+### 3. 启动后端服务 (FastAPI)
+进入 `backend` 目录，安装依赖并启动热更新服务器：
+```bash
+cd backend
+python -m venv venv
+.\venv\Scripts\activate  # Windows 环境
+# source venv/bin/activate # Linux/Mac 环境
 
-### 4. 普通话语音评测模块 (TBD)
-- **技术储备：** 已完成接入科大讯飞 (iFLYTEK) 语音评测 API 的可行性调研。作为弹性扩展项，该模块目前处于方案保留阶段，待资源充足时开启正式集成。
+pip install -r requirements.txt
+.\venv\Scripts\python.exe -m uvicorn main:app --reload
+```
+后端服务默认运行在 `http://127.0.0.1:8000`。
+
+### 4. 启动前端服务 (React + Vite)
+进入 `Web-frontend` 目录：
+```bash
+cd Web-frontend
+npm install
+npm run dev
+```
+前端服务默认运行在 `http://localhost:5173`。
+
+---
+
+## ☁️ 云端服务器部署说明 (生产环境)
+
+本指南适用于将项目部署至阿里云、腾讯云等云端服务器。
+
+### 1. 环境要求
+部署前请确保服务器已安装以下基础环境：
+- **操作系统**: Ubuntu 20.04+ 或 CentOS 7.6+ (建议使用 Linux)
+- **后端环境**: Python 3.9+
+- **前端环境**: Node.js 16+ (建议使用 LTS 版本)
+- **数据库**: MySQL 8.0+
+- **Web 服务器**: Nginx (用于反向代理和静态资源分发)
+
+### 2. 数据库部署 (云端 MySQL)
+- 若使用云端 RDS 或自建 MySQL，请按前文的「数据库构建」执行建表及导入结构。
+
+### 3. 后端部署 (Gunicorn)
+1. **获取代码并创建虚拟环境**:
+   ```bash
+   cd /your/deploy/path/backend
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+2. **配置文件修改**:
+   - 同样需要修改 `backend/config.py`，录入正确的生产环境数据库密码和各项 API 密钥。
+   - 编辑 `main.py`: 找到 `allow_origins=["*"]`，将通配符替换为您正式的前端生产域名，以增强安全性。
+3. **运行服务 (建议使用 Gunicorn 守护进程)**:
+   ```bash
+   pip install gunicorn
+   gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:8000 --daemon
+   ```
+
+### 4. 前端部署
+1. **编译生产环境包**:
+   在开发机或 CI 服务器上进入 `Web-frontend` 目录：
+   ```bash
+   npm install
+   npm run build
+   ```
+   编译后会生成 `dist` 文件夹，该文件夹包含了压缩优化过的静态资源。
+2. **配置检查**:
+   - 确保 `backend/config.py` 的相关 API key 已经就绪（前端动态通过 `/api/config` 获取接口安全配置）。
+   - 检查前端连接后端的 API 调用基地址变量（如 `API_BASE_URL`）是否指向您的正式后端域名。
+3. **分发静态文件**:
+   将生成的 `dist` 文件夹完整上传至服务器指定的 Web 目录。
+
+### 5. Nginx 代理配置示例
+在 `/etc/nginx/conf.d/` 下新建项目配置文件：
+```nginx
+server {
+    listen 80;
+    server_name your_domain.com; # 替换您的域名
+
+    # 前端静态资源
+    location / {
+        root /your/deploy/path/Web-frontend/dist;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 后端 API 代理
+    location /api {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # 文件上传目录映射
+    location /uploads {
+        alias /your/deploy/path/backend/uploads;
+        expires 30d;
+    }
+}
+```
+
+### 6. 部署上线实测检查点 (Checkpoint)
+- [ ] **跨域设置**: 检查 `main.py` 的 CORS 是否已允许正式的前端域名。
+- [ ] **文件权限**: 确保云服务器的 `backend/uploads` 目录对后端进程拥有可写与可读权限。
+- [ ] **数据库与API测试**: 验证后端服务能否正常连接云端 MySQL 以及天气/地图 API 密钥没有填错或被访问限制。
 
 ---
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import UploadModal from '../../components/UploadModal';
 import '../Home.css';
 
 const API_BASE_URL = 'http://127.0.0.1:8000/api';
@@ -18,6 +19,7 @@ export default function CultureDetail() {
     const [recordingTime, setRecordingTime] = useState(0);
     const [showOptions, setShowOptions] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [showUploadModal, setShowUploadModal] = useState(false);
 
     // Stories States
     const [stories, setStories] = useState([]);
@@ -56,12 +58,7 @@ export default function CultureDetail() {
         };
     }, [isRecording]);
 
-    const handleFileChange = (e) => {
-        const selectedFile = e.target.files[0];
-        if (selectedFile) {
-            confirmUpload(selectedFile);
-        }
-    };
+    // Removed handleFileChange because UploadModal directly calls confirmUpload with file
 
     const startRecording = async () => {
         if (!navigator.mediaDevices || !window.MediaRecorder) {
@@ -196,7 +193,7 @@ export default function CultureDetail() {
                                 <span>🔴</span> 立即在线录音
                             </button>
                             <button
-                                onClick={() => document.getElementById('audio-upload').click()}
+                                onClick={() => setShowUploadModal(true)}
                                 style={{
                                     width: '100%', padding: '12px', background: '#FEF3C7', color: '#B45309',
                                     border: '1px solid #FDE68A', borderRadius: '10px', cursor: 'pointer', fontWeight: 600,
@@ -240,12 +237,13 @@ export default function CultureDetail() {
                         </div>
                     )}
 
-                    <input
-                        type="file"
-                        id="audio-upload"
+                    <UploadModal 
+                        isOpen={showUploadModal} 
+                        onClose={() => setShowUploadModal(false)}
+                        onUploadSuccess={confirmUpload}
                         accept="audio/*,video/*"
-                        style={{ display: 'none' }}
-                        onChange={handleFileChange}
+                        title="上传本地音频"
+                        uploadUrl="" 
                     />
                 </div>
 
