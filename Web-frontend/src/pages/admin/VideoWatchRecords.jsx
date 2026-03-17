@@ -106,16 +106,24 @@ export default function VideoWatchRecords() {
     };
 
     const handleDeleteVideo = async (id) => {
+        const normalizedId = Number(id);
+        if (!Number.isInteger(normalizedId) || normalizedId <= 0) {
+            alert('删除失败：无效的视频ID');
+            return;
+        }
+
         if (!window.confirm('确定要删除该视频吗？删除后不可恢复。')) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`${API_BASE_URL}/admin/videos/${id}`, {
+            await axios.delete(`${API_BASE_URL}/admin/videos/${normalizedId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             alert('视频已删除');
             fetchVideos();
         } catch (err) {
-            alert('删除视频失败');
+            const errorMessage = err?.response?.data?.detail || err?.response?.data?.message || err?.message || '未知错误';
+            console.error('删除视频失败', err);
+            alert(`删除视频失败：${errorMessage}`);
         }
     };
 

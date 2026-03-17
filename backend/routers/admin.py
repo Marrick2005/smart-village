@@ -1,11 +1,40 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import List, Optional
 from pydantic import BaseModel
+from urllib.parse import urlparse
+from pathlib import Path
 from database import get_db
 from models import FarmingBehaviorRecord, VolunteerFeedback, PublicActivity, User, Video, GuestFeedback
 
 router = APIRouter()
+UPLOAD_ROOT = (Path(__file__).resolve().parent.parent / "uploads").resolve()
+
+
+def _extract_upload_file_path(file_url: Optional[str]) -> Optional[Path]:
+    """Resolve a local uploads file path from full URL or relative uploads path."""
+    if not file_url:
+        return None
+
+    parsed = urlparse(file_url)
+    raw_path = parsed.path if parsed.scheme else file_url
+
+    if raw_path.startswith("/uploads/"):
+        relative = raw_path[len("/uploads/"):]
+    elif raw_path.startswith("uploads/"):
+        relative = raw_path[len("uploads/"):]
+    elif "/uploads/" in raw_path:
+        relative = raw_path.split("/uploads/", 1)[1]
+    else:
+        return None
+
+    candidate = (UPLOAD_ROOT / relative).resolve()
+    try:
+        candidate.relative_to(UPLOAD_ROOT)
+    except ValueError:
+        return None
+    return candidate
 
 # --- Farming Behavior Endpoints ---
 
@@ -279,10 +308,47 @@ def delete_video(video_id: int, db: Session = Depends(get_db)):
     video = db.query(Video).filter(Video.video_id == video_id).first()
     if not video:
         raise HTTPException(status_code=404, detail="Video not found")
-        
+
+    file_paths = [
+        _extract_upload_file_path(video.video_url),
+        _extract_upload_file_path(video.cover_url),
+    ]
+
     db.delete(video)
-    db.commit()
-    return {"status": "success", "message": "视频已删除"}
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="删除失败：该视频存在关联记录且数据库外键未级联删除，请检查约束配置。",
+        )
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="删除失败：数据库操作异常")
+
+    deleted_files = []
+    file_delete_warnings = []
+    for path in file_paths:
+        if path is None:
+            continue
+
+        if not path.exists():
+            file_delete_warnings.append(f"文件不存在: {path.name}")
+            continue
+
+        try:
+            path.unlink()
+            deleted_files.append(path.name)
+        except OSError as exc:
+            file_delete_warnings.append(f"删除失败 {path.name}: {exc}")
+
+    return {
+        "status": "success",
+        "message": "视频已删除",
+        "deleted_files": deleted_files,
+        "file_delete_warnings": file_delete_warnings,
+    }
 
 # --- Guest Feedback Management ---
 
